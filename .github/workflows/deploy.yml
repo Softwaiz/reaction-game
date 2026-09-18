@@ -1,0 +1,65 @@
+name: Deploy to celld
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      # Normalizes @cloudflare/vite-plugin's output into a shape celld
+      # accepts — see https://github.com/softwaiz/recell
+      - name: Adapt build for celld
+        run: npx --yes @softwaiz/recell dist
+
+      - name: Ship build to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          source: "dist/*"
+          target: "${{ secrets.DEPLOY_PATH }}/apps/reaction-game"
+          strip_components: 1
+          overwrite: true
+
+      # The celld + SeaweedFS platform (docker-compose.yml, .env) already
+      # runs persistently on the server — this step only ships one app's
+      # build into it via the same containerized `celld deploy` used
+      # locally throughout development. It does not touch the platform
+      # itself.
+      - name: Deploy via celld
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            set -euo pipefail
+            cd "${{ secrets.DEPLOY_PATH }}"
+            set -a; source .env; set +a
+            docker compose run --rm --entrypoint celld \
+              -e AWS_ACCESS_KEY_ID="$SEAWEEDFS_ACCESS_KEY" \
+              -e AWS_SECRET_ACCESS_KEY="$SEAWEEDFS_SECRET_KEY" \
+              -v "${{ secrets.DEPLOY_PATH }}/apps/reaction-game:/project" \
+              celld deploy /project \
+              --bucket s3://celld-fleet \
+              --endpoint http://seaweedfs:8333 \
+              --region us-east-1
