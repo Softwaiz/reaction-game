@@ -16,7 +16,7 @@ Cloudflare's Workers/Durable Objects platform — running off Cloudflare
 entirely. Background on that investigation:
 [What RedwoodSDK Actually Depends On](https://stories.softwaiz.com/redwoodsdk-celld)
 and
-[Deploying RedwoodSDK to Production Without Cloudflare](https://stories.softwaiz.com/redwoodsdk-celld-production).
+[RedwoodSDK, Finally Unlocked from Cloudflare](https://stories.softwaiz.com/redwoodsdk-celld-production).
 
 ## How it works
 
