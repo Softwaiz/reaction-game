@@ -6,6 +6,20 @@ export const Document: React.FC<{ children: React.ReactNode }> = ({
       <meta charSet="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <title>Reaction — RedwoodSDK on celld</title>
+      <meta
+        name="description"
+        content="A light flashes at the same instant for everyone here — timed by a Durable Object alarm on a self-hosted celld node, not your browser's clock. First click wins. Built with RedwoodSDK, running entirely off Cloudflare."
+      />
+      <meta property="og:type" content="website" />
+      <meta property="og:title" content="Reaction — RedwoodSDK on celld" />
+      <meta
+        property="og:description"
+        content="A synchronized multiplayer reaction game. Self-hosted on celld — off Cloudflare entirely."
+      />
+      <meta property="og:image" content="https://game.softwaiz.com/og-image.png" />
+      <meta property="og:url" content="https://game.softwaiz.com/" />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:image" content="https://game.softwaiz.com/og-image.png" />
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link
         rel="preconnect"
